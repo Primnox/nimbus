@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Primnox's Nimbus</title>
+  <link rel="icon" type="image/svg+xml" href="nimbus.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <div class="stage" id="stage">
+    <canvas id="painting-canvas" class="painting-canvas"></canvas>
+    <canvas id="bloom-canvas" class="bloom-canvas"></canvas>
+    <div id="tint-layer" class="tint-layer"></div>
+
+    <!-- Scene 0 Hero Overlay -->
+    <div id="hero-overlay" class="hero-overlay">
+      <div class="hero-logo-box" id="hero-logo-box">
+        <canvas id="splash-canvas" class="splash-canvas" width="240" height="240"></canvas>
+        <img src="nimbus.svg" alt="Nimbus logo" class="hero-logo-img" id="hero-logo-img">
+      </div>
+      <div class="hero-copy" id="hero-copy">
+        <h1 class="hero-title">Primnox's Nimbus</h1>
+        <p class="hero-subtitle">A browser for Windows, built on Firefox.</p>
+        <div class="hero-actions">
+          <a href="https://github.com/Primnox/nimbus/releases/latest" class="btn-download">Download for Windows</a>
+        </div>
+      </div>
+      <div class="scroll-hint" id="scroll-hint" aria-hidden="true">
+        <svg class="chevron-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Scaler container for the 1040x650 mock window -->
+    <div class="window-scaler" id="window-scaler">
+      <!-- Window stroke outline drawn in Scene 0 -->
+      <svg class="window-outline-svg" viewBox="0 0 1040 650" aria-hidden="true">
+        <rect id="outline-rect" x="2" y="2" width="1036" height="646" rx="18" ry="18" fill="none" stroke="rgba(255, 255, 255, 0.9)" stroke-width="3"></rect>
+      </svg>
+
+      <!-- Mock Nimbus Window -->
+      <div class="mock-window" id="mock-window">
+        <!-- Top Strip (40px) -->
+        <div class="win-top-strip" id="win-top-strip">
+          <div class="workspace-chips" id="workspace-chips">
+            <div class="chip chip-home active" id="chip-home" data-ws="home">
+              <span class="chip-dot"></span>
+              <span class="chip-initial">H</span>
+              <span class="chip-name">Home</span>
+            </div>
+            <div class="chip chip-study" id="chip-study" data-ws="study">
+              <span class="chip-dot"></span>
+              <span class="chip-initial">S</span>
+              <span class="chip-name">Study</span>
+            </div>
+            <div class="chip chip-work" id="chip-work" data-ws="work">
+              <span class="chip-dot"></span>
+              <span class="chip-initial">W</span>
+              <span class="chip-name">Work</span>
+            </div>
+            <div class="chip-keycap" id="chip-keycap" aria-hidden="true">Alt+2</div>
+          </div>
+
+          <div class="tabs-container" id="tabs-container">
+            <div class="win-tab active" id="tab-primary">
+              <span class="tab-favicon-spot" id="tab-favicon-spot">
+                <span class="tab-favicon-dot" id="tab-favicon-dot"></span>
+              </span>
+              <span class="tab-title" id="tab-primary-title">fieldnotes - Why watercolor blooms</span>
+            </div>
+            <div class="win-tab" id="tab-secondary">
+              <span class="tab-favicon-spot">
+                <span class="tab-favicon-dot dot-alt"></span>
+              </span>
+              <span class="tab-title" id="tab-secondary-title">New Tab</span>
+            </div>
+            <button class="win-tab-new" aria-label="New tab" tabindex="-1">
+              <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <line x1="8" y1="3" x2="8" y2="13"></line>
+                <line x1="3" y1="8" x2="13" y2="8"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="win-controls" aria-hidden="true">
+            <span class="win-btn win-minimize">
+              <svg viewBox="0 0 12 12" width="10" height="10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                <line x1="2" y1="6" x2="10" y2="6"></line>
+              </svg>
+            </span>
+            <span class="win-btn win-maximize">
+              <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.6">
+                <rect x="2" y="2" width="8" height="8" rx="1"></rect>
+              </svg>
+            </span>
+            <span class="win-btn win-close">
+              <svg viewBox="0 0 12 12" width="10" height="10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                <line x1="2.5" y1="2.5" x2="9.5" y2="9.5"></line>
+                <line x1="9.5" y1="2.5" x2="2.5" y2="9.5"></line>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- Address Bar Row (44px) -->
+        <div class="win-address-row" id="win-address-row">
+          <div class="nav-buttons">
+            <button class="nav-btn" aria-label="Back" tabindex="-1">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="10 4 6 8 10 12"></polyline>
+              </svg>
+            </button>
+            <button class="nav-btn" aria-label="Forward" tabindex="-1">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 4 10 8 6 12"></polyline>
+              </svg>
+            </button>
+            <button class="nav-btn" aria-label="Reload" tabindex="-1">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M13.5 8 A 5.5 5.5 0 1 1 11.8 4.1"></path>
+                <polyline points="12 1.5 12 4.5 9 4.5"></polyline>
+              </svg>
+            </button>
+          </div>
+
+          <div class="address-field" id="address-field">
+            <svg class="lock-icon" viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="3.5" y="6.5" width="9" height="7.5" rx="1.5"></rect>
+              <path d="M5.5 6.5 V 4.5 A 2.5 2.5 0 0 1 10.5 4.5 V 6.5"></path>
+            </svg>
+            <span class="url-text" id="url-text">fieldnotes.blog/why-watercolor-blooms</span>
+          </div>
+
+          <!-- Media Player Pill (Scene 10) -->
+          <div class="media-player-pill" id="media-player-pill">
+            <div class="media-cover"></div>
+            <div class="media-info">
+              <span class="media-title">Rain on glass</span>
+              <span class="media-artist">Lo Tide</span>
+            </div>
+            <div class="media-play-btn">
+              <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
+                <polygon points="5 3 13 8 5 13"></polygon>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Toolbar Right Icons -->
+          <div class="toolbar-icons">
+            <!-- Sparkle icon (Scene 11) -->
+            <div class="sparkle-wrap" id="sparkle-wrap">
+              <svg class="sparkle-icon" viewBox="0 0 24 24" width="22" height="22" fill="#7c3aed" stroke="#7c3aed" stroke-width="1.5">
+                <path d="M12 2 L14.5 9.5 L22 12 L14.5 14.5 L12 22 L9.5 14.5 L2 12 L9.5 9.5 Z"></path>
+              </svg>
+              <div class="brush-stroke" id="brush-stroke"></div>
+            </div>
+
+            <div class="shield-wrap" id="shield-wrap" title="Protections">
+              <svg class="shield-icon" viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 2 L13 4.5 V 8.5 C 13 11.5 10.5 13.8 8 14.5 C 5.5 13.8 3 11.5 3 8.5 V 4.5 Z"></path>
+              </svg>
+            </div>
+            <div class="notebook-tool-icon" id="notebook-tool-icon" title="Notebook">
+              <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                <rect x="3.5" y="2.5" width="9" height="11" rx="1.5"></rect>
+                <line x1="6" y1="5.5" x2="10" y2="5.5"></line>
+                <line x1="6" y1="8" x2="10" y2="8"></line>
+                <line x1="6" y1="10.5" x2="8.5" y2="10.5"></line>
+              </svg>
+            </div>
+            <div class="menu-icon" title="Menu">
+              <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                <line x1="3" y1="4.5" x2="13" y2="4.5"></line>
+                <line x1="3" y1="8" x2="13" y2="8"></line>
+                <line x1="3" y1="11.5" x2="13" y2="11.5"></line>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Window Body -->
+        <div class="win-body" id="win-body">
+          <!-- Left Floating Rail (40px) -->
+          <div class="left-app-rail" id="left-app-rail">
+            <div class="rail-icon icon-w">W</div>
+            <div class="rail-icon icon-t">T</div>
+            <div class="rail-icon icon-m">M</div>
+            <div class="rail-icon icon-i">I</div>
+            <div class="rail-icon icon-add">+</div>
+          </div>
+
+          <!-- Glass Sidebar (Scene 2 Layouts) -->
+          <div class="win-sidebar" id="win-sidebar">
+            <div class="sidebar-header">
+              <div class="sidebar-address-field">
+                <svg class="lock-icon" viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <rect x="3.5" y="6.5" width="9" height="7.5" rx="1.5"></rect>
+                  <path d="M5.5 6.5 V 4.5 A 2.5 2.5 0 0 1 10.5 4.5 V 6.5"></path>
+                </svg>
+                <span class="sidebar-url-text">fieldnotes.blog</span>
+              </div>
+              <div class="sidebar-chips">
+                <span class="chip-dot chip-home-dot"></span>
+                <span class="chip-dot chip-study-dot"></span>
+                <span class="chip-dot chip-work-dot"></span>
+              </div>
+            </div>
+            <div class="sidebar-tab-list">
+              <div class="sidebar-tab active">
+                <span class="tab-favicon-dot"></span>
+                <span class="sidebar-tab-label">Why watercolor blooms</span>
+              </div>
+              <div class="sidebar-tab">
+                <span class="tab-favicon-dot dot-alt"></span>
+                <span class="sidebar-tab-label">New Tab</span>
+              </div>
+              <div class="sidebar-tab">
+                <span class="tab-favicon-dot dot-ref"></span>
+                <span class="sidebar-tab-label">Pigment notes</span>
+              </div>
+            </div>
+            <div class="sidebar-foot">
+              <div class="rail-icon icon-w">W</div>
+              <div class="rail-icon icon-t">T</div>
+              <div class="rail-icon icon-m">M</div>
+              <div class="rail-icon icon-i">I</div>
+            </div>
+          </div>
+
+          <!-- Page Card Area -->
+          <div class="page-viewport" id="page-viewport">
+            <!-- New Tab View (Scene 1) -->
+            <div class="page-new-tab" id="page-new-tab">
+              <div class="new-tab-search">
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                  <circle cx="7" cy="7" r="4.5"></circle>
+                  <line x1="10.5" y1="10.5" x2="14" y2="14"></line>
+                </svg>
+                <span>Search the web</span>
+              </div>
+              <div class="speed-dial-grid">
+                <div class="speed-dial-tile"><span class="tile-glyph">G</span>GitHub</div>
+                <div class="speed-dial-tile"><span class="tile-glyph">W</span>Wikipedia</div>
+                <div class="speed-dial-tile"><span class="tile-glyph">D</span>Docs</div>
+                <div class="speed-dial-tile"><span class="tile-glyph">M</span>Weather</div>
+                <div class="speed-dial-tile"><span class="tile-glyph">N</span>News</div>
+                <div class="speed-dial-tile"><span class="tile-glyph">B</span>Notes</div>
+              </div>
+            </div>
+
+            <!-- Blog View ("fieldnotes") -->
+            <div class="page-card" id="page-card">
+              <div class="page-scroll-content" id="page-scroll-content">
+                <header class="blog-header">fieldnotes</header>
+                <div class="blog-main-grid">
+                  <div class="blog-content">
+                    <h1 class="blog-title" id="blog-title">Why watercolor blooms</h1>
+
+                    <!-- Fictional loud banner ad -->
+                    <div class="banner-ad" id="banner-ad">
+                      <div class="banner-badge">SALE</div>
+                      <div class="banner-text">Brightcart MEGA SALE 70% OFF</div>
+                      <div class="banner-cta">SHOP NOW</div>
+                    </div>
+
+                    <div class="blog-body" id="blog-body">
+                      <p>
+                        A watercolor wash stays alive as long as the paper holds moisture. When a fresh brush loaded with damp water touches a drying wash, water rushes outward, pushing pigment ahead of it.
+                      </p>
+                      <div class="blog-image-box">
+                        <div class="blog-gradient-art"></div>
+                      </div>
+                      <p>
+                        The heavier grains stay put while lighter particles flow to the edge of the puddle, drying into a distinctive feathered fringe. Learn more in our study on <a href="#pigments" class="blog-link" id="link-pigments" tabindex="-1">how pigments settle</a> on cold press sheets.
+                      </p>
+                      <p>
+                        Pure pigment density varies dramatically between synthetic lakes and natural earth minerals, giving each mixture an individual rhythm of dispersal across the paper surface.
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Right Ads Column (for Scene 9) -->
+                  <div class="blog-sidebar-ads" id="blog-sidebar-ads">
+                    <div class="side-ad" id="side-ad-1">
+                      <span class="ad-tag">Sponsored</span>
+                      <div class="ad-box-graphic bg-yellow"></div>
+                      <p class="ad-box-text">Instant Shopping Deals</p>
+                    </div>
+                    <div class="side-ad" id="side-ad-2">
+                      <span class="ad-tag">Sponsored</span>
+                      <div class="ad-box-graphic bg-orange"></div>
+                      <p class="ad-box-text">Super Discount Fast</p>
+                    </div>
+                    <div class="side-ad" id="side-ad-3">
+                      <span class="ad-tag">Sponsored</span>
+                      <div class="ad-box-graphic bg-cyan"></div>
+                      <p class="ad-box-text">Flash Promo 80% Off</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Blog Archive Page (Revealed by gesture in Scene 7) -->
+              <div class="blog-archive-page" id="blog-archive-page">
+                <header class="blog-header">fieldnotes</header>
+                <h2 class="archive-heading">Recent Writings</h2>
+                <div class="archive-list">
+                  <div class="archive-item">
+                    <span class="archive-item-title">Why watercolor blooms</span>
+                    <span class="archive-item-meta">Yesterday &middot; 4 min read</span>
+                  </div>
+                  <div class="archive-item">
+                    <span class="archive-item-title">Granulation and paper textures</span>
+                    <span class="archive-item-meta">Oct 18 &middot; 6 min read</span>
+                  </div>
+                  <div class="archive-item">
+                    <span class="archive-item-title">The history of lapis lazuli</span>
+                    <span class="archive-item-meta">Oct 12 &middot; 5 min read</span>
+                  </div>
+                  <div class="archive-item">
+                    <span class="archive-item-title">Mixing shadows without black</span>
+                    <span class="archive-item-meta">Oct 05 &middot; 3 min read</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Split View Second Page (Scene 8) -->
+            <div class="page-split-card" id="page-split-card">
+              <div class="split-card-header">
+                <span class="split-title">Notes Scratchpad</span>
+              </div>
+              <div class="split-card-body">
+                <h3>Field Notes &amp; Observations</h3>
+                <ul>
+                  <li>Rough surface retains water in pockets</li>
+                  <li>Glazes dry with darker pooled fringes</li>
+                  <li>Layering transparent washes creates depth</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Notebook Slide-in Panel (Scene 5) -->
+            <div class="notebook-panel" id="notebook-panel">
+              <div class="notebook-tabs">
+                <div class="nb-tab active" id="nb-tab-read">Read later</div>
+                <div class="nb-tab" id="nb-tab-notes">Notes</div>
+              </div>
+              <div class="notebook-content">
+                <button class="btn-save-page" id="btn-save-page" tabindex="-1">Save this page</button>
+                <div class="read-later-list" id="read-later-list">
+                  <div class="saved-item" id="saved-page-item">
+                    <span class="saved-item-title">Why watercolor blooms</span>
+                    <span class="saved-item-site">fieldnotes.blog</span>
+                  </div>
+                </div>
+                <div class="notes-view" id="notes-view">
+                  <div class="notes-textarea" id="notes-textarea">
+                    <span class="typed-text" id="typed-text"></span>
+                    <span class="typing-caret" id="typing-caret"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Link Peek Card (Scene 4) -->
+            <div class="link-peek-card" id="link-peek-card">
+              <div class="peek-card-header">
+                <div class="peek-source">
+                  <span class="tab-favicon-dot"></span>
+                  <span class="peek-site">fieldnotes.blog</span>
+                </div>
+                <div class="peek-actions">
+                  <span class="peek-pill">Keep as tab</span>
+                </div>
+              </div>
+              <div class="peek-card-body">
+                <h2 class="peek-title">How pigments settle</h2>
+                <div class="peek-illu"></div>
+                <p class="peek-desc">
+                  Granulation happens when dense mineral particles tumble into the micro-valleys of rough cold press paper, creating the signature stippled texture beloved by painters.
+                </p>
+              </div>
+            </div>
+
+            <!-- Glass Context Menu (Scene 6) -->
+            <div class="context-menu" id="context-menu">
+              <div class="ctx-item">Back</div>
+              <div class="ctx-item">Reload</div>
+              <div class="ctx-item highlight" id="ctx-hide-item">Hide this on fieldnotes.blog</div>
+            </div>
+
+            <!-- Mouse Gestures Overlay (Scene 7) -->
+            <div class="gesture-overlay" id="gesture-overlay">
+              <svg class="gesture-svg" id="gesture-svg">
+                <defs>
+                  <filter id="gesture-glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+                <path id="gesture-path" d="" fill="none" stroke="#5b7a52" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#gesture-glow)"></path>
+                <polygon id="gesture-arrow" points="0,0 0,0 0,0" fill="#5b7a52" filter="url(#gesture-glow)"></polygon>
+              </svg>
+              <div class="gesture-pill" id="gesture-pill">Back</div>
+              <div class="gesture-mouse" id="gesture-mouse">
+                <div class="mouse-btn btn-left"></div>
+                <div class="mouse-btn btn-right active"></div>
+              </div>
+            </div>
+
+            <!-- Ad Bubbles Particle Container (Scene 9) -->
+            <div class="bubble-particles" id="bubble-particles"></div>
+
+            <!-- Floating Envelopes Container (Scene 11) -->
+            <div class="envelopes-layer" id="envelopes-layer"></div>
+
+            <!-- Window Mock Cursor -->
+            <div class="win-cursor" id="win-cursor">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="#1d1a24" stroke="#ffffff" stroke-width="1.4">
+                <path d="M3 2 L10 21 L13 14 L20 12 Z"></path>
+              </svg>
+              <div class="cursor-keycap" id="cursor-keycap">Alt</div>
+              <div class="click-ripple" id="click-ripple"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene 12 Get It Overlay -->
+    <div class="get-it-overlay" id="get-it-overlay">
+      <img src="nimbus.svg" alt="Nimbus logo" class="get-it-logo" id="get-it-logo">
+      <h2 class="get-it-title" id="get-it-title">Primnox's Nimbus 1.0.0</h2>
+      <p class="get-it-text" id="get-it-text">For Windows 10 and 11. 93 MB.</p>
+      <div class="get-it-actions">
+        <a href="https://github.com/Primnox/nimbus/releases/latest" class="btn-download">Download for Windows</a>
+      </div>
+    </div>
+
+    <!-- Frosted Caption Panel Under Window -->
+    <div class="caption-container" id="caption-container">
+      <div class="caption-panel" id="caption-panel">
+        <div class="caption-title" id="caption-title">Primnox's Nimbus</div>
+        <div class="caption-text" id="caption-text">A browser for Windows, built on Firefox.</div>
+        <div class="caption-live" id="caption-live"></div>
+      </div>
+    </div>
+
+    <!-- Reduced Motion Button -->
+    <button id="motion-toggle" class="motion-toggle" hidden>Turn on motion</button>
+  </div>
+
+  <!-- Tall Story Scroll Track (17.0 vh = 1700vh) -->
+  <div class="scroll-track" id="scroll-track"></div>
+
+  <!-- Post-Story Normal Section (Not sticky, paper color #f2ede3) -->
+  <section class="download-section" id="download-section">
+    <div class="download-card">
+      <img src="nimbus.svg" alt="Nimbus logo" class="download-logo">
+      <a href="https://github.com/Primnox/nimbus/releases/latest" class="btn-download">Download for Windows</a>
+      <p class="note-text">Version 1.0.0. The installer isn't code-signed yet, so Windows may say it's from an unknown publisher.</p>
+      <p class="license-text">Nimbus is built on Mozilla Firefox and shared under the Mozilla Public License 2.0. <a href="https://github.com/Primnox/nimbus/releases" class="repo-link">Releases on GitHub</a></p>
+      <div class="primnox-brand">Primnox</div>
+    </div>
+  </section>
+
+  <script type="module" src="site.js"></script>
+</body>
+</html>
