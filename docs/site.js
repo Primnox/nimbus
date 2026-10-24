@@ -21,8 +21,26 @@ const CAPTIONS = [
   { title: "Ads blocked", text: "Built in, YouTube included." },
   { title: "Media controls", text: "Whatever is playing, in a tab or another app, in one small player." },
   { title: "Private", text: "No AI features. Nothing is sent to Mozilla." },
-  { title: "Primnox's Nimbus 1.0.0", text: "For Windows 10 and 11. 93 MB." }
+  { title: "Primnox's Nimbus 1.0.3", text: "For Windows 10 and 11. 93 MB." }
 ];
+
+// The version and size come from the latest release, so the page never shows
+// an old one. The text above and in index.html is only the fallback.
+fetch('https://api.github.com/repos/Primnox/nimbus/releases/latest')
+  .then((r) => (r.ok ? r.json() : null))
+  .then((release) => {
+    const match = release && /^v?(\d+(?:\.\d+)*)$/.exec(release.tag_name || '');
+    if (!match) return;
+    const version = match[1];
+    const exe = (release.assets || []).find((a) => /\.exe$/i.test(a.name || ''));
+    const getIt = CAPTIONS[CAPTIONS.length - 1];
+    getIt.title = `Primnox's Nimbus ${version}`;
+    if (exe) getIt.text = `For Windows 10 and 11. ${Math.round(exe.size / 1048576)} MB.`;
+    document.getElementById('get-it-title').textContent = getIt.title;
+    document.getElementById('get-it-text').textContent = getIt.text;
+    document.getElementById('version-note').textContent = `Version ${version}. The installer isn't code-signed yet, so Windows may say it's from an unknown publisher.`;
+  })
+  .catch(() => {});
 
 const THEME_KEYS = [
   'meadow', 'tide', 'dune', 'bloom', 'dusk', 'pine',
