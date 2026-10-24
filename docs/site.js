@@ -376,6 +376,7 @@ export const scenes = [
       }
 
       heroOverlay.style.display = 'flex';
+      heroOverlay.style.opacity = '1';
       const heroP = Math.max(0, 1 - t * 2.2);
       heroCopy.style.opacity = `${heroP}`;
       heroCopy.style.transform = `translateY(${-40 * t}px)`;
