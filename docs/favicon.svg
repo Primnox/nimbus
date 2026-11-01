@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- The same mark drawn for tabs and the taskbar: fewer, bolder shapes so it
+       stays clear at 16 to 48 pixels. -->
+  <defs>
+    <clipPath id="tile"><rect width="64" height="64" rx="14"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5fb2ee"/>
+      <stop offset="0.6" stop-color="#bfe2f7"/>
+      <stop offset="1" stop-color="#f3d2c0"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e4eef7"/>
+    </linearGradient>
+  </defs>
+  <g clip-path="url(#tile)">
+    <rect width="64" height="64" fill="url(#sky)"/>
+    <path d="M-2 66 L-2 50 C 14 47 32 41 66 30 L66 66 Z" fill="#9dba8a"/>
+    <path d="M-2 66 L-2 57 C 18 55 40 49 66 41 L66 66 Z" fill="#628a58"/>
+    <path d="M17 47 C 11.5 47 9 43 9.6 39.4 C 10.2 35.4 13.6 33 17.6 33.4
+             C 18.4 26.8 23.8 22.8 30.4 23.2 C 33.2 18.2 41 17 45.6 21.6
+             C 48.8 24.8 49.4 28.6 48.4 31.4 C 53.4 32.2 55.6 36.4 54.8 40.2
+             C 54 44.2 50.8 47 46.8 47 Z"
+          fill="url(#glass)" stroke="#3f6f9a" stroke-opacity="0.55" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M27 26.6 C 28.8 24.6 31.2 23.9 33.4 24.1" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>

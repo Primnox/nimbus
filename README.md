@@ -13,7 +13,7 @@ glass sidebar, over a watercolor painting that changes with the theme.
 ## Download
 
 Get the newest installer from [Releases](https://github.com/Primnox/nimbus/releases).
-Nimbus checks for a newer version once a day and offers it in Settings, About.
+Nimbus checks for a newer version once a day and offers it in Settings, Updates.
 Nothing installs until you say so.
 
 The installer isn't code-signed yet, so Windows may say it's from an unknown
