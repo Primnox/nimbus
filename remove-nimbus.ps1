@@ -2,10 +2,11 @@
 # (profiles with history, passwords, tabs and settings, their cache, update
 # downloads, shortcuts and registry entries). A reinstall then starts fresh.
 #
-# Nimbus keeps its profiles in the same folder as Firefox does,
-# %APPDATA%\Mozilla\Firefox, so only the profiles Nimbus made are removed and
-# a real Firefox's profiles stay. When nothing but Nimbus used that folder, the
-# whole folder goes.
+# Nimbus 1.0.12 and later keep their data in their own folder,
+# %APPDATA%\Primnox\Nimbus, which goes whole. Up to 1.0.11 Nimbus kept its
+# profiles where Firefox does, %APPDATA%\Mozilla\Firefox, so there only the
+# profiles Nimbus made are removed and a real Firefox's profiles stay. When
+# nothing but Nimbus used that folder, the whole folder goes.
 #
 #   powershell -ExecutionPolicy Bypass -File remove-nimbus.ps1 -DryRun   lists what would go
 #   powershell -ExecutionPolicy Bypass -File remove-nimbus.ps1           removes it
@@ -98,7 +99,8 @@ foreach ($i in $installs | Where-Object { -not $DataOnly }) {
       Start-Process -FilePath $i.Uninstaller -ArgumentList '/S' -Wait
       # The uninstaller hands off to a copy of itself, so wait for the files.
       $until = (Get-Date).AddSeconds(90)
-      while ((Test-Path -LiteralPath (Join-Path $i.Dir 'firefox.exe')) -and (Get-Date) -lt $until) { Start-Sleep -Milliseconds 500 }
+      # nimbus.exe since 1.0.12, firefox.exe before.
+      while (((Test-Path -LiteralPath (Join-Path $i.Dir 'nimbus.exe')) -or (Test-Path -LiteralPath (Join-Path $i.Dir 'firefox.exe'))) -and (Get-Date) -lt $until) { Start-Sleep -Milliseconds 500 }
     }
   }
   if (Test-Path -LiteralPath $i.Dir) {
@@ -110,8 +112,14 @@ foreach ($i in $installs | Where-Object { -not $DataOnly }) {
   }
 }
 foreach ($hive in @('HKLM:\Software\Mozilla', 'HKLM:\Software\WOW6432Node\Mozilla', 'HKCU:\Software\Mozilla') | Where-Object { -not $DataOnly }) {
-  foreach ($key in Get-ChildItem $hive -ErrorAction SilentlyContinue | Where-Object { $_.PSChildName -like 'Primnox Nimbus*' }) {
+  # 'Nimbus' is where 1.0.12 and later keep their taskbar and other settings.
+  foreach ($key in Get-ChildItem $hive -ErrorAction SilentlyContinue | Where-Object { $_.PSChildName -like 'Primnox Nimbus*' -or $_.PSChildName -eq 'Nimbus' }) {
     Step "delete the registry key $($key.Name)" { Remove-Item -LiteralPath $key.PSPath -Recurse -Force }
+  }
+}
+foreach ($key in @('HKLM:\Software\Primnox\Nimbus', 'HKCU:\Software\Primnox\Nimbus') | Where-Object { -not $DataOnly }) {
+  if (Test-Path $key) {
+    Step "delete the registry key $key" { Remove-Item -LiteralPath $key -Recurse -Force }
   }
 }
 $shell = New-Object -ComObject WScript.Shell
@@ -131,6 +139,18 @@ foreach ($ld in $linkDirs | Where-Object { -not $DataOnly }) {
 
 Say ''
 Say 'Data'
+# Nimbus's own folder (1.0.12 and later): only Nimbus uses it, so it goes whole.
+foreach ($own in (Join-Path $env:APPDATA 'Primnox\Nimbus'), (Join-Path $env:LOCALAPPDATA 'Primnox\Nimbus')) {
+  if (Test-Path -LiteralPath $own) {
+    Step "delete $own" {
+      Remove-Item -LiteralPath $own -Recurse -Force
+      $parent = Split-Path $own -Parent
+      if ((Test-Path -LiteralPath $parent) -and -not (Get-ChildItem -LiteralPath $parent -Force)) { Remove-Item -LiteralPath $parent -Force }
+    }
+  }
+}
+
+# Firefox's folder, where 1.0.11 and older kept their profiles.
 $moz = Join-Path $env:APPDATA 'Mozilla\Firefox'
 $mozLocal = Join-Path $env:LOCALAPPDATA 'Mozilla\Firefox'
 
